@@ -1,10 +1,5 @@
 use thiserror::Error;
 
-#[derive(Debug, Clone)]
-pub struct Document {
-    pub id: String,
-    pub content: String,
-}
 
 #[derive(Debug, Error)]
 pub enum CoreError {
@@ -17,9 +12,9 @@ pub enum CoreError {
     #[error("Storage error: {0}")]
     StorageError(String),
 }
-
+/// Simulate a document processing function that might fail
 pub fn process_document(doc_id: &str) -> Result<String, CoreError> {
-    // Simulate a document processing function that might fail
+
     if doc_id.is_empty() {
         return Err(CoreError::InvalidDocument("Empty document ID".to_string()));
     }
@@ -37,8 +32,9 @@ pub fn process_document(doc_id: &str) -> Result<String, CoreError> {
     Ok(format!("Processed document content for ID: {}", doc_id))
 }
 
+/// Simulate document validation
 pub fn validate_document(content: &str) -> Result<(), CoreError> {
-    // Simulate document validation
+
     if content.len() < 10 {
         return Err(CoreError::InvalidDocument("Document too short".to_string()));
     }

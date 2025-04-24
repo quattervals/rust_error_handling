@@ -1,4 +1,3 @@
-use anyhow::{self, Context};
 use thiserror::Error;
 use crate::intermediate::services::{self, ServiceError};
 
@@ -34,7 +33,6 @@ pub fn api_process_document(doc_id: &str) -> Result<(), ApiError> {
                 _ => ApiError::InternalError("An unexpected error occurred".to_string()),
             }
         })?;
-        // .context(format!("API request failed for document {}", doc_id))?;
 
     println!("API successfully processed document: {}", result);
     Ok(())
@@ -65,7 +63,7 @@ pub fn api_create_document(doc_id: &str, content: &str) -> Result<(), ApiError> 
                 },
             }
         })?;
-        //.context("Document creation failed")?;
+
 
     println!("API successfully created document with ID: {}", doc_id);
     Ok(())

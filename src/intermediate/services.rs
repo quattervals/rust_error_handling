@@ -1,5 +1,4 @@
 use crate::core::{self, models::CoreError};
-use anyhow::{self, Context};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -27,23 +26,19 @@ pub fn handle_document(doc_id: &str) -> Result<String, ServiceError> {
                 _ => err.into(),
             }
         })?;
-        // .context("Failed during document handling")?;
 
-    // Further processing
+
     Ok(format!("Service processed: {}", content))
 }
 
 pub fn validate_and_process(doc_id: &str, content: &str) -> Result<String, ServiceError> {
-    // First validate
-    core::models::validate_document(content)
-        .map_err(|err| match err {
-            CoreError::InvalidDocument(reason) => {
-                ServiceError::ValidationError(format!("Document validation failed: {}", reason))
-            }
-            _ => err.into(),
-        })?;
-        // .context("Document validation step failed")?;
 
-    // Then process
-    handle_document(doc_id) //.context("Processing step failed after validation")?
+    core::models::validate_document(content).map_err(|err| match err {
+        CoreError::InvalidDocument(reason) => {
+            ServiceError::ValidationError(format!("Document validation failed: {}", reason))
+        }
+        _ => err.into(),
+    })?;
+
+    handle_document(doc_id)
 }
