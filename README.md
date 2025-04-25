@@ -1,6 +1,7 @@
 # Onion Architecture Error Handling Example
 
-This project demonstrates error handling in a Rust application structured using the onion architecture pattern. The application is organized into three distinct layers:
+This project demonstrates error handling in a Rust application structured using an onion-like architecture pattern.
+The application is organized into three layers:
 
 1. **Core Layer (Inner)**: Contains the core business logic and fundamental error types
 2. **Intermediate Layer**: Service layer that uses the core and provides additional context to errors
@@ -21,7 +22,7 @@ This project demonstrates error handling in a Rust application structured using 
     ├── outer
     │   ├── handlers.rs  # API handlers + API error types
     │   └── mod.rs
-    └── main.rs          # Application entry point
+    └── main.rs          # User application
 ```
 
 ## Error Handling Approach
@@ -36,20 +37,17 @@ This project demonstrates several error handling techniques:
 
 ## Design Philosophy
 
+On the inner layers, enum errors are passed up the call chain. These errors are handled internally when possible.
+
+On the boundary between `handlers` and `main.rs`, `anyhow` error types are used. Only non-recoverable errors are passed to the user/main. With `anyhow`-style errors, the users just get an error and does not have to deal with specific error types.
+
 Each layer defines its own error types directly within its main module file:
 
+
 - **Core Layer**: `CoreError` in models.rs
+  - For demo purposes, the display trait in this module is implemented by hand
 - **Intermediate Layer**: `ServiceError` in services.rs
+  - The error trait implementations are handled with the `thiserror` crate
 - **Outer Layer**: `ApiError` in handlers.rs
 
 This approach keeps error definitions close to the code that uses them, making the relationship between errors and their respective modules clearer.
-
-## Running the Project
-
-To run the example:
-
-```bash
-cargo run
-```
-
-This will execute several test cases that demonstrate how errors propagate through the layers and how they are handled at each level.
