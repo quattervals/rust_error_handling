@@ -2,9 +2,7 @@ mod core;
 mod intermediate;
 mod outer;
 
-use anyhow::Result;
-
-fn main() -> Result<()> {
+fn main() {
     println!("=== Testing Error Handling in Onion Architecture ===\n");
 
     println!("Valid document");
@@ -45,7 +43,7 @@ fn main() -> Result<()> {
     }
     println!();
 
-    println!(" Creating document with invalid content");
+    println!("Creating document with invalid content");
     match outer::handlers::api_create_document("new_doc", "Too short") {
         Ok(_) => println!("✅ Success: Document created successfully"),
         Err(e) => println!("❌ Error: {:#}", e),
@@ -65,6 +63,4 @@ fn main() -> Result<()> {
         Err(e) => println!("❌ Error: {:#}", e),
     }
     println!();
-
-    Ok(())
 }

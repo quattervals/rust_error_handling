@@ -7,10 +7,8 @@ use crate::intermediate::services::{self, ServiceError};
 pub enum ApiError {
     #[error("Service error: {0}")]
     ServiceError(#[from] ServiceError),
-
     #[error("Bad request: {0}")]
     BadRequest(String),
-
     #[error("Internal server error: {0}")]
     InternalError(String),
 }
@@ -24,12 +22,8 @@ pub fn api_process_document(doc_id: &str) -> anyhow::Result<()> {
 
     let result = services::handle_document(doc_id).map_err(|err| {
         let api_err = match err {
-            ServiceError::ProcessingError(msg) => {
-                ApiError::BadRequest(format!("Could not process document: {}", msg))
-            }
             ServiceError::ValidationError(msg) => ApiError::BadRequest(msg),
-            // For other errors, use internal error or automatic conversion
-            _ => ApiError::InternalError("An unexpected error occurred".to_string()),
+            _ => ApiError::InternalError(err.to_string()),
         };
         anyhow::anyhow!(api_err).context(format!("Failed processing document {}", doc_id))
     })?;
@@ -59,7 +53,6 @@ pub fn api_create_document(doc_id: &str, content: &str) -> anyhow::Result<()> {
     services::validate_and_process(doc_id, content).map_err(|err| {
         let api_err = match err {
             ServiceError::ValidationError(msg) => ApiError::BadRequest(msg),
-            ServiceError::ProcessingError(msg) => ApiError::BadRequest(msg),
             ServiceError::CoreError(core_err) => {
                 ApiError::InternalError(format!("Core system error: {}", core_err))
             }

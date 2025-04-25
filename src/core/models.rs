@@ -1,20 +1,35 @@
-use thiserror::Error;
+use std::fmt;
 
-
-#[derive(Debug, Error)]
+/// Represents core document processing errors.
+/// For demo purposes, the `fmt::Display` and `std::error::Error` traits are implented manually
+#[derive(Debug)]
 pub enum CoreError {
-    #[error("Document not found: {0}")]
     DocumentNotFound(String),
-
-    #[error("Invalid document: {0}")]
     InvalidDocument(String),
-
-    #[error("Storage error: {0}")]
     StorageError(String),
 }
-/// Simulate a document processing function that might fail
-pub fn process_document(doc_id: &str) -> Result<String, CoreError> {
 
+impl std::fmt::Display for CoreError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::DocumentNotFound(s) => write!(f, "[Core Display] Document not found: \"{}\"", s),
+            Self::InvalidDocument(s) => write!(f, "[Core Display] Invalid Document: \"{}\"", s),
+            Self::StorageError(s) => write!(f, "[Core Display] Storage Error:\"{}\"", s),
+        }
+    }
+}
+
+impl std::error::Error for CoreError {}
+
+/// Simulate processing of a document with the given ID and returns its content.
+///
+/// # Arguments
+/// * `doc_id` - A string slice that holds the document identifier
+///
+/// # Returns
+/// * `Ok(String)` - A string containing the processed document content
+/// * `Err(CoreError)` - An error variant when processing fails
+pub fn process_document(doc_id: &str) -> Result<String, CoreError> {
     if doc_id.is_empty() {
         return Err(CoreError::InvalidDocument("Empty document ID".to_string()));
     }
@@ -34,7 +49,6 @@ pub fn process_document(doc_id: &str) -> Result<String, CoreError> {
 
 /// Simulate document validation
 pub fn validate_document(content: &str) -> Result<(), CoreError> {
-
     if content.len() < 10 {
         return Err(CoreError::InvalidDocument("Document too short".to_string()));
     }
