@@ -1,66 +1,66 @@
-mod core;
-mod intermediate;
-mod outer;
+mod domain;
+mod usecases;
+mod api;
 
 fn main() {
     println!("=== Testing Error Handling in Onion Architecture ===\n");
 
     println!("Valid document");
-    match outer::handlers::api_process_document("valid_doc") {
+    match api::api::api_process_document("valid_doc") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     };
     println!();
 
     println!("Document not found");
-    match outer::handlers::api_process_document("not_found") {
+    match api::api::api_process_document("not_found") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!("Empty document ID");
-    match outer::handlers::api_process_document("") {
+    match api::api::api_process_document("") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!(" Storage error");
-    match outer::handlers::api_process_document("storage_error") {
+    match api::api::api_process_document("storage_error") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!("Creating document with valid content");
-    match outer::handlers::api_create_document(
+    match api::api::api_create_document(
         "new_doc",
         "This is a valid document with enough content",
     ) {
         Ok(_) => println!("✅ Success: Document created successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!("Creating document with invalid content");
-    match outer::handlers::api_create_document("new_doc", "Too short") {
+    match api::api::api_create_document("new_doc", "Too short") {
         Ok(_) => println!("✅ Success: Document created successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!("Creating document with empty ID");
-    match outer::handlers::api_create_document("", "Too short") {
+    match api::api::api_create_document("", "Too short") {
         Ok(_) => println!("✅ Success: Document created successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 
     println!("Creating document with empty content");
-    match outer::handlers::api_create_document("sane_id", "") {
+    match api::api::api_create_document("sane_id", "") {
         Ok(_) => println!("✅ Success: Document created successfully"),
-        Err(e) => println!("❌ Error: {:#}", e),
+        Err(e) => println!("❌ Error: {:#?}", e),
     }
     println!();
 }

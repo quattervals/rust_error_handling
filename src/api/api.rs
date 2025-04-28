@@ -1,12 +1,12 @@
 use anyhow::{self, Context};
 use thiserror::Error;
 
-use crate::intermediate::services::{self, ServiceError};
+use crate::usecases::usecases::{self, UseCaseError};
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("Service error: {0}")]
-    ServiceError(#[from] ServiceError),
+    #[error("Use case error: {0}")]
+    UseCaseError(#[from] UseCaseError),
     #[error("Bad request: {0}")]
     BadRequest(String),
     #[error("Internal server error: {0}")]
@@ -20,9 +20,9 @@ pub fn api_process_document(doc_id: &str) -> anyhow::Result<()> {
         )));
     }
 
-    let result = services::handle_document(doc_id).map_err(|err| {
+    let result = usecases::handle_document(doc_id).map_err(|err| {
         let api_err = match err {
-            ServiceError::ValidationError(msg) => ApiError::BadRequest(msg),
+            UseCaseError::ValidationError(msg) => ApiError::BadRequest(msg),
             _ => ApiError::InternalError(err.to_string()),
         };
         anyhow::anyhow!(api_err).context(format!("Failed processing document {}", doc_id))
@@ -50,11 +50,11 @@ pub fn api_create_document(doc_id: &str, content: &str) -> anyhow::Result<()> {
         ));
     }
 
-    services::validate_and_process(doc_id, content).map_err(|err| {
+    usecases::validate_and_process(doc_id, content).map_err(|err| {
         let api_err = match err {
-            ServiceError::ValidationError(msg) => ApiError::BadRequest(msg),
-            ServiceError::CoreError(core_err) => {
-                ApiError::InternalError(format!("Core system error: {}", core_err))
+            UseCaseError::ValidationError(msg) => ApiError::BadRequest(msg),
+            UseCaseError::DomainError(core_err) => {
+                ApiError::InternalError(format!("domain system error: {}", core_err))
             }
         };
         anyhow::anyhow!(api_err)
