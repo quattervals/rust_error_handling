@@ -8,7 +8,9 @@ fn main() {
     println!("Valid document");
     match api::api_process_document("valid_doc") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#?}", e),
+        Err(e) => {
+            println!("❌ Error: {:#?}", e);
+        }
     };
     println!();
 

@@ -1,33 +1,56 @@
-use anyhow::{self, Context};
+use crate::usecases::{self, UseCaseError};
 
-use crate::usecases::{self};
+#[derive(Debug)]
+#[allow(dead_code, reason = "compiler thinks the Strings are unused")]
+pub enum ApiError {
+    UseCaseError(String),
+    BadRequest(String),
+}
 
-pub fn api_process_document(doc_id: &str) -> anyhow::Result<()> {
+/// If we didn't allow dead code, we would have to have this message() impl.
+/// This would be verbose and error prone since we have to list/match all members
+// impl ApiError {
+//     pub fn message(&self) -> &str {
+//         match self {
+//             ApiError::UseCaseError(msg) => msg,
+//             ApiError::BadRequest(msg) => msg,
+//             ApiError::InternalError(msg) => msg,
+//         }
+//     }
+// }
+impl From<UseCaseError> for ApiError {
+    fn from(err: UseCaseError) -> Self {
+        ApiError::UseCaseError(format!("UseCaseError String Representation '{0}'", err))
+    }
+}
+
+pub fn api_process_document(doc_id: &str) -> Result<(), ApiError> {
     if doc_id.trim().is_empty() {
-        return Err(anyhow::anyhow!("Document ID cannot be empty"));
+        return Err(ApiError::BadRequest(
+            "Document ID cannot be empty".to_string(),
+        ));
     }
 
-    let result: String = usecases::handle_document(doc_id).map_err(|err| {
-        anyhow::anyhow!(err).context(format!("Failed processing document {}", doc_id))
-    })?;
+    let result = usecases::handle_document(doc_id)?;
 
     println!("API successfully processed document: {}", result);
     Ok(())
 }
 
-pub fn api_create_document(doc_id: &str, content: &str) -> anyhow::Result<()> {
+pub fn api_create_document(doc_id: &str, content: &str) -> Result<(), ApiError> {
     if doc_id.trim().is_empty() {
-        return Err(anyhow::anyhow!("Document ID cannot be empty"));
-    }
-
-    if content.trim().is_empty() {
-        return Err(anyhow::anyhow!("Document content cannot be empty")).context(format!(
-            "This content with id: '{}' is not good.\n",
-            doc_id.trim()
+        return Err(ApiError::BadRequest(
+            "Document ID cannot be empty".to_string(),
         ));
     }
 
-    usecases::validate_and_process(doc_id, content).map_err(|err| anyhow::anyhow!(err))?;
+    if content.trim().is_empty() {
+        return Err(ApiError::BadRequest(
+            "Document content cannot be empty".to_string(),
+        ));
+    }
+
+    usecases::validate_and_process(doc_id, content)?;
 
     Ok(())
 }
