@@ -3,6 +3,17 @@ name = "error_handling"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "error_handling"
+proc-macro = true
+
+[[bin]]
+name = "error_handling_bin"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = "1.0"
 thiserror = "2.0"
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full"] }
