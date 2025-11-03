@@ -1,6 +1,6 @@
+mod api;
 mod domain;
 mod usecases;
-mod api;
 
 fn main() {
     println!("=== Testing Error Handling in Onion Architecture ===\n");
@@ -8,7 +8,9 @@ fn main() {
     println!("Valid document");
     match api::api::api_process_document("valid_doc") {
         Ok(_) => println!("✅ Success: Document processed successfully"),
-        Err(e) => println!("❌ Error: {:#?}", e),
+        Err(e) => {
+            println!("❌ Error: {:#?}", e);
+        }
     };
     println!();
 
@@ -34,10 +36,7 @@ fn main() {
     println!();
 
     println!("Creating document with valid content");
-    match api::api::api_create_document(
-        "new_doc",
-        "This is a valid document with enough content",
-    ) {
+    match api::api::api_create_document("new_doc", "This is a valid document with enough content") {
         Ok(_) => println!("✅ Success: Document created successfully"),
         Err(e) => println!("❌ Error: {:#?}", e),
     }

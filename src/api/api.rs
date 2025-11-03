@@ -1,64 +1,61 @@
-use anyhow::{self, Context};
-use thiserror::Error;
-
 use crate::usecases::usecases::{self, UseCaseError};
 
-#[derive(Debug, Error)]
+
+#[derive(Debug)]
+#[allow(dead_code, reason="compiler thinks the Strings are unused")]
 pub enum ApiError {
-    #[error("Use case error: {0}")]
-    UseCaseError(#[from] UseCaseError),
-    #[error("Bad request: {0}")]
+    UseCaseError(String),
     BadRequest(String),
-    #[error("Internal server error: {0}")]
-    InternalError(String),
 }
 
-pub fn api_process_document(doc_id: &str) -> anyhow::Result<()> {
+
+/// If we didn't allow dead code, we would have to have this message() impl.
+/// This would be verbose and error prone since we have to list/match all members
+// impl ApiError {
+//     pub fn message(&self) -> &str {
+//         match self {
+//             ApiError::UseCaseError(msg) => msg,
+//             ApiError::BadRequest(msg) => msg,
+//             ApiError::InternalError(msg) => msg,
+//         }
+//     }
+// }
+
+impl From<UseCaseError> for ApiError {
+    fn from(err: UseCaseError) -> Self {
+        ApiError::UseCaseError(format!("UseCaseError String Representation '{0}'", err))
+    }
+}
+
+// impl From<
+
+pub fn api_process_document(doc_id: &str) -> Result<(), ApiError> {
     if doc_id.trim().is_empty() {
-        return Err(anyhow::anyhow!(ApiError::BadRequest(
-            "Document ID cannot be empty".to_string()
-        )));
+        return Err(ApiError::BadRequest(
+            "Document ID cannot be empty".to_string(),
+        ));
     }
 
-    let result = usecases::handle_document(doc_id).map_err(|err| {
-        let api_err = match err {
-            UseCaseError::ValidationError(msg) => ApiError::BadRequest(msg),
-            _ => ApiError::InternalError(err.to_string()),
-        };
-        anyhow::anyhow!(api_err).context(format!("Failed processing document {}", doc_id))
-    })?;
+    let result = usecases::handle_document(doc_id)?;
 
     println!("API successfully processed document: {}", result);
     Ok(())
 }
 
-pub fn api_create_document(doc_id: &str, content: &str) -> anyhow::Result<()> {
+pub fn api_create_document(doc_id: &str, content: &str) -> Result<(), ApiError> {
     if doc_id.trim().is_empty() {
-        return Err(anyhow::anyhow!(ApiError::BadRequest(
-            "Document ID cannot be empty".to_string()
-        ),))
-        .context("Context about doc_id");
-    }
-
-    if content.trim().is_empty() {
-        return Err(anyhow::anyhow!(ApiError::BadRequest(
-            "Document content cannot be empty".to_string(),
-        )))
-        .context(format!(
-            "This content with id: \"{}\" is not good.\n",
-            doc_id.trim()
+        return Err(ApiError::BadRequest(
+            "Document ID cannot be empty".to_string(),
         ));
     }
 
-    usecases::validate_and_process(doc_id, content).map_err(|err| {
-        let api_err = match err {
-            UseCaseError::ValidationError(msg) => ApiError::BadRequest(msg),
-            UseCaseError::DomainError(core_err) => {
-                ApiError::InternalError(format!("domain system error: {}", core_err))
-            }
-        };
-        anyhow::anyhow!(api_err)
-    })?;
+    if content.trim().is_empty() {
+        return Err(ApiError::BadRequest(
+            "Document content cannot be empty".to_string(),
+        ));
+    }
+
+    usecases::validate_and_process(doc_id, content)?;
 
     Ok(())
 }
