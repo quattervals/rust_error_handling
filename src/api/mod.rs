@@ -4,8 +4,8 @@ use error_handling::StringFrom;
 #[derive(Debug, StringFrom)]
 #[allow(dead_code, reason = "compiler thinks the Strings are unused")]
 pub enum ApiError {
-    #[stringfrom(UseCaseError)]
-    UseCaseError(String),
+    #[stringfrom("use case error")]
+    UseCaseError(String, #[from] UseCaseError),
     BadRequest(String),
 }
 
