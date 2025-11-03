@@ -1,28 +1,14 @@
 use crate::usecases::{self, UseCaseError};
+use error_handling::StringFrom;
 
-#[derive(Debug)]
+#[derive(Debug, StringFrom)]
 #[allow(dead_code, reason = "compiler thinks the Strings are unused")]
 pub enum ApiError {
+    #[stringfrom(UseCaseError)]
     UseCaseError(String),
     BadRequest(String),
 }
 
-/// If we didn't allow dead code, we would have to have this message() impl.
-/// This would be verbose and error prone since we have to list/match all members
-// impl ApiError {
-//     pub fn message(&self) -> &str {
-//         match self {
-//             ApiError::UseCaseError(msg) => msg,
-//             ApiError::BadRequest(msg) => msg,
-//             ApiError::InternalError(msg) => msg,
-//         }
-//     }
-// }
-impl From<UseCaseError> for ApiError {
-    fn from(err: UseCaseError) -> Self {
-        ApiError::UseCaseError(format!("UseCaseError String Representation '{0}'", err))
-    }
-}
 
 pub fn api_process_document(doc_id: &str) -> Result<(), ApiError> {
     if doc_id.trim().is_empty() {
