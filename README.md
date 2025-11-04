@@ -14,14 +14,11 @@ The application is organized into three layers:
 ├── Cargo.toml
 └── src
     ├── domain
-    │   ├── domain.rs    # Domain implementations + domain error types
-    │   └── mod.rs
+    │   ├── mod.rs       # Domain implementations + domain error types
     ├── usecases
-    │   ├── usecases.rs  # Service implementations + service error types
-    │   └── mod.rs
+    │   ├── mod.rs       # Service implementations + service error types
     ├── api
-    │   ├── api.rs       # API handlers + API error types
-    │   └── mod.rs
+    │   ├── mod.rs       # API handlers + API error types
     └── main.rs          # Consumer/user application
 ```
 
