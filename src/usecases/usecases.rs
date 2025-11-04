@@ -18,7 +18,6 @@ pub enum UseCaseError {
 /// # Returns
 /// * `Ok(String)` - Successfully processed document content with service layer prefix
 /// * `Err(UseCaseError::DomainError)`
-
 pub fn handle_document(doc_id: &str) -> Result<String, UseCaseError> {
     let content = domain::process_document(doc_id)?;
     Ok(format!("Service processed: {}", content))
